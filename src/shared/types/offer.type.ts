@@ -1,45 +1,50 @@
-import {User} from './user.type.js';
+import { User } from './user.type.js';
 
-export type City = {
-    name: string;
-    latitude: number;
-    longitude: number;
-}
+export const OfferCityEnum = {
+  Paris: 'Paris',
+  Cologne: 'Cologne',
+  Brussels: 'Brussels',
+  Amsterdam: 'Amsterdam',
+  Hamburg: 'Hamburg',
+  Dusseldorf: 'Dusseldorf',
+} as const;
+export type OfferCityType = (typeof OfferCityEnum)[keyof typeof OfferCityEnum];
 
-export enum Convenience {
-    Breakfast = 'Breakfast',
-    AirConditioning = 'Air conditioning',
-    LaptopFriendlyWorkspace = 'Laptop friendly workspace',
-    BabySeat = 'Baby seat',
-    Washer = 'Washer',
-    Towels = 'Towels',
-    Fridge = 'Fridge',
-};
+export const OfferTypeEmum = {
+  Apartment: 'Apartment',
+  House: 'House',
+  Room: 'Room',
+  Hotel: 'Hotel',
+} as const;
+export type OfferType = (typeof OfferTypeEmum)[keyof typeof OfferTypeEmum];
 
-export enum OfferType {
-    Apartment = 'Apartment',
-    House = 'House',
-    Room = 'Room',
-    Hotel = 'Hotel',
-};
+export const OfferFeatureEnum = {
+  Breakfast: 'Breakfast',
+  AirConditioning: 'Air conditioning',
+  LaptopFriendlyWorkspace: 'Laptop friendly workspace',
+  BabySeat: 'Baby seat',
+  Washer: 'Washer',
+  Towels: 'Towels',
+  Fridge: 'Fridge',
+} as const;
+export type OfferFeatureType =
+    (typeof OfferFeatureEnum)[keyof typeof OfferFeatureEnum];
 
 export type Offer = {
-    title: string;
+    name: string;
     description: string;
-    postDate: Date;
-    city: City;
-    previewPath: string;
+    date: Date;
+    city: OfferCityType;
+    preview: string;
     images: string[];
     isPremium: boolean;
     isFavorite: boolean;
     rating: number;
     type: OfferType;
-    roomsCount: number;
-    guestsCount: number;
+    rooms: number;
+    guests: number;
     price: number;
-    conveniences: Convenience[];
-    author: User;
-    commentsCount: number;
-    latitude: number;
-    longitude: number;
-}
+    features: OfferFeatureType[];
+    user: User;
+    coordinates: [number, number];
+};

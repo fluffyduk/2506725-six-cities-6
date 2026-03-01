@@ -1,3 +1,3 @@
-export * from './comment.type.js';
-export * from './offer.type.js';
-export * from './user.type.js';
+export * from './comment.type.ts';
+export * from './offer.type.ts';
+export * from './user.type.ts';

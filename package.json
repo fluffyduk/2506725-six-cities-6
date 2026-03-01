@@ -14,8 +14,9 @@
         "lint": "eslint src/ --ext .ts",
         "compile": "tsc -p tsconfig.json",
         "clean": "rimraf dist",
-        "ts": "ts-node",
-        "cli": "node --loader ts-node/esm ./src/main.cli.ts"
+        "ts": "tsx",
+        "cli": "node --import ts-node/esm ./src/main.cli.ts",
+        "json-server": "json-server ./mocks/mock-server-data.json --port 3123"
     },
     "devDependencies": {
         "@types/node": "^18.16.3",
@@ -23,9 +24,10 @@
         "@typescript-eslint/parser": "5.46.0",
         "eslint": "8.39.0",
         "eslint-config-htmlacademy": "9.1.1",
+        "json-server": "^1.0.0-beta.12",
         "rimraf": "3.0.2",
         "ts-node": "10.9.1",
-        "typescript": "4.9.5"
+        "typescript": "5.7"
     },
     "type": "module",
     "engines": {
@@ -33,6 +35,9 @@
         "npm": ">=8"
     },
     "dependencies": {
-        "chalk": "^5.6.2"
+        "axios": "^1.13.6",
+        "chalk": "^5.6.2",
+        "dayjs": "^1.11.19",
+        "tsx": "^4.21.0"
     }
 }

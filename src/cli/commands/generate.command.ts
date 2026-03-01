@@ -20,8 +20,6 @@ const isMockServerData = (data: unknown): data is MockServerData =>
 export class GenerateCommand implements Command {
   private initialData!: MockServerData;
 
-
-  
   private async load(url: string) {
     try {
       const response = await axios.get(url);

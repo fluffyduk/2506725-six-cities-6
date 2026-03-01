@@ -1,0 +1,81 @@
+{
+    "api": {
+        "titles": [
+            "Spacious penthouse with rooftop terrace",
+            "Designer studio in art district",
+            "Classic townhouse near central park",
+            "Sunny apartment with balcony",
+            "Rustic cottage with fireplace",
+            "Luxury suite with panoramic views"
+        ],
+        "descriptions": [
+            "Stylish penthouse featuring floor-to-ceiling windows, modern furniture and private rooftop access with city skyline views.",
+            "Artistic neighborhood location, unique interior design with original artworks and high ceilings for creative inspiration.",
+            "Charming historic building with restored original details, cozy atmosphere and peaceful garden courtyard.",
+            "Bright corner apartment with morning sun, comfortable workspace and close to organic cafes and shops.",
+            "Wooden beams, cozy fireplace and fully equipped kitchen create perfect retreat from city hustle.",
+            "Elegant interiors, premium bedding and floor-to-ceiling windows offering spectacular sunset views."
+        ],
+        "cities": [
+            "Paris",
+            "Cologne",
+            "Brussels",
+            "Amsterdam",
+            "Hamburg",
+            "Dusseldorf"
+        ],
+        "previewImages": [
+            "https://images.example.com/preview-07.jpg",
+            "https://images.example.com/preview-08.jpg",
+            "https://images.example.com/preview-09.jpg",
+            "https://images.example.com/preview-10.jpg",
+            "https://images.example.com/preview-11.jpg",
+            "https://images.example.com/preview-12.jpg"
+        ],
+        "photos": [
+            "https://images.example.com/photo-13.jpg",
+            "https://images.example.com/photo-14.jpg",
+            "https://images.example.com/photo-15.jpg",
+            "https://images.example.com/photo-16.jpg",
+            "https://images.example.com/photo-17.jpg",
+            "https://images.example.com/photo-18.jpg",
+            "https://images.example.com/photo-19.jpg",
+            "https://images.example.com/photo-20.jpg",
+            "https://images.example.com/photo-21.jpg",
+            "https://images.example.com/photo-22.jpg",
+            "https://images.example.com/photo-23.jpg",
+            "https://images.example.com/photo-24.jpg"
+        ],
+        "types": [
+            "Apartment",
+            "Room",
+            "House",
+            "Hotel"
+        ],
+        "features": [
+            "Breakfast",
+            "Air conditioning",
+            "Laptop friendly workspace",
+            "Baby seat",
+            "Washer",
+            "Towels",
+            "Fridge"
+        ],
+        "users": [
+            {
+                "name": "Ivan",
+                "email": "ivan@example.com",
+                "avatar": "img/avatar-ivan.jpg",
+                "password": "secret_password",
+                "type": "Ordinary"
+            },
+            {
+                "name": "Oleg",
+                "email": "oleg@example.com",
+                "avatar": "img/avatar-oleg.jpg",
+                "password": "some_password",
+                "type": "Pro"
+            }
+        ]
+    }
+}

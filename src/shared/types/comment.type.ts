@@ -1,4 +1,4 @@
-import { User } from './user.type.js';
+import { User } from './user.type.ts';
 
 export type Comment = {
     text: string;

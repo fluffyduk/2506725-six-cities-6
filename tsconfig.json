@@ -21,6 +21,7 @@
         "outDir": "./dist",
         "emitDecoratorMetadata": true,
         "rewriteRelativeImportExtensions": true,
+        "strictPropertyInitialization": false,
         "types": [
             "node",
         ],

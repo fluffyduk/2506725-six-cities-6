@@ -1,16 +1,70 @@
 import chalk from 'chalk';
 import { TsvFileReader } from '../../shared/libs/file-reader/index.js';
 import { Command } from './command.interface.js';
-import { createOffer, getErrorMessage } from '../../shared/helpers/index.js';
+import { createOffer, getErrorMessage, getMongoURI } from '../../shared/helpers/index.js';
+import { UserService } from '../../shared/modules/user/user-service.interface.js';
+import { DatabaseClient } from '../../shared/libs/database-client/database-client.interface.js';
+import { Logger } from '../../shared/libs/logger/logger.interface.js';
+import { DefaultUserService } from '../../shared/modules/user/default-user.service.js';
+import { MongoDatabaseClient } from '../../shared/libs/database-client/mongo.database-client.js';
+import { Offer } from '../../shared/types/offer.type.js';
+import { DEFAULT_DB_PORT, DEFAULT_USER_PASSWORD } from './command.constant.js';
+import { OfferService } from '../../shared/modules/offer/offer-service.interface.js';
+import { ConsoleLogger } from '../../shared/libs/logger/console.logger.js';
+import { DefaultOfferService } from '../../shared/modules/offer/default-offer.service.js';
+import { OfferModel } from '../../shared/modules/offer/offer.entity.js';
+import { UserModel } from '../../shared/modules/user/user.entity.js';
 
 export class ImportCommand implements Command {
+  private userService: UserService;
+  private offerService: OfferService;
+  private databaseClient: DatabaseClient;
+  private logger: Logger;
+  private salt: string;
+
+  constructor() {
+    this.logger = new ConsoleLogger();
+    this.offerService = new DefaultOfferService(this.logger, OfferModel);
+    this.userService = new DefaultUserService(this.logger, UserModel);
+    this.databaseClient = new MongoDatabaseClient(this.logger);
+  }
+
   public getName(): string {
     return '--import';
   }
 
+  private async saveOffer(offer: Offer) {
+    const user = await this.userService.findOrCreate(
+      {
+        ...offer.user,
+        password: DEFAULT_USER_PASSWORD,
+      },
+      this.salt
+    );
+
+    await this.offerService.create({
+      user: user,
+      name: offer.name,
+      description: offer.description,
+      images: offer.images,
+      date: offer.date.toISOString(),
+      price: offer.price,
+      type: offer.type,
+      city: offer.city,
+      preview: offer.preview,
+      isPremium: offer.isPremium,
+      isFavorite: offer.isFavorite,
+      rating: offer.rating,
+      rooms: offer.rooms,
+      guests: offer.guests,
+      features: offer.features,
+      coordinates: offer.coordinates,
+    });
+  }
+
   private async onImportedLine(line: string): Promise<void> {
     const offer = createOffer(line);
-    console.log(offer);
+    await this.saveOffer(offer);
   }
 
   public async onImportEnd(totalLines: number): Promise<void> {
@@ -19,13 +73,27 @@ export class ImportCommand implements Command {
         `Import completed successfully! Total lines: ${chalk.yellow(totalLines)}`
       )
     );
+    await this.databaseClient.disconnect();
   }
 
-  public async execute(...parameters: string[]): Promise<void> {
-    const [filePath] = parameters;
+  public async execute(
+    filePath: string,
+    login: string,
+    password: string,
+    host: string,
+    dbname: string,
+    salt: string
+  ): Promise<void> {
+    const uri = getMongoURI(login, password, host, DEFAULT_DB_PORT, dbname);
+    this.salt = salt;
+
+    await this.databaseClient.connect(uri);
     const fileReader = new TsvFileReader(filePath.trim());
 
-    fileReader.on('line', (line) => this.onImportedLine(line));
+    fileReader.on('line', async (line, resolve) => {
+      await this.onImportedLine(line);
+      resolve();
+    });
     fileReader.on('end', (totalLines) => this.onImportEnd(totalLines));
 
     try {

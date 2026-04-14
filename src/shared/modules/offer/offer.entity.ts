@@ -16,6 +16,7 @@ import {
 } from '../../types/index.js';
 import { UserEntity } from '../user/user.entity.js';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-declaration-merging
 export interface OfferEntity extends defaultClasses.Base {}
 
 @modelOptions({
@@ -23,6 +24,7 @@ export interface OfferEntity extends defaultClasses.Base {}
     collection: 'offers',
   },
 })
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class OfferEntity extends defaultClasses.TimeStamps implements Offer {
   @prop({
     required: true,

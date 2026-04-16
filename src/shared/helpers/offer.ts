@@ -1,10 +1,8 @@
 import {
-  Offer,
   OfferCityType,
   OfferFeatureType,
   OfferType,
-  UserType,
-  UserTypeEnum,
+  ParsedLine,
 } from '../types/index.js';
 import {
   OfferTypeEmum,
@@ -32,10 +30,7 @@ const isOfferCityType = (city: string): city is OfferCityType =>
 const isOfferFeatureType = (feature: string): feature is OfferFeatureType =>
   includes(Object.values(OfferFeatureEnum), feature);
 
-const isUserType = (type: string): type is UserType =>
-  includes(Object.values(UserTypeEnum), type);
-
-export const createOffer = (line: string): Offer => {
+export const createOffer = (line: string): ParsedLine => {
   const [
     name,
     description,
@@ -58,38 +53,47 @@ export const createOffer = (line: string): Offer => {
   const coord = coordinates.split(';').map(Number);
   const featuresArray = features.split(';');
 
-  if (
-    !isCoordinatesValid(coord) ||
-    !isOfferType(type) ||
-    !isOfferCityType(city) ||
-    !featuresArray.every(isOfferFeatureType) ||
-    !isUserType(userType)
-  ) {
-    throw new Error(`Invalid offer data: ${line}`);
+  if (!isCoordinatesValid(coord)) {
+    throw new Error(`Invalid coordinates: ${coordinates}`);
+  }
+
+  if (!isOfferType(type)) {
+    throw new Error(`Invalid offer type: ${type}`);
+  }
+
+  if (!isOfferCityType(city)) {
+    throw new Error(`Invalid city: ${city}`);
+  }
+
+  if (!featuresArray.every(isOfferFeatureType)) {
+    const invalid = featuresArray.filter((f) => !isOfferFeatureType(f));
+    throw new Error(`Invalid features: ${invalid.join(', ')}`);
   }
 
   return {
-    name,
-    description,
-    date: new Date(date),
-    city,
-    preview,
-    images: images.split(';'),
-    isPremium: isPremium === 'true',
-    isFavorite: isFavorite === 'true',
-    rating: parseFloat(rating),
-    type,
-    rooms: parseInt(rooms, 10),
-    guests: parseInt(guests, 10),
-    price: parseInt(price, 10),
-    features: featuresArray,
+    offer: {
+      name,
+      description,
+      date: new Date(date),
+      city,
+      preview,
+      images: images.split(';'),
+      isPremium: isPremium === 'true',
+      isFavorite: isFavorite === 'true',
+      rating: parseFloat(rating),
+      type,
+      rooms: parseInt(rooms, 10),
+      guests: parseInt(guests, 10),
+      price: parseInt(price, 10),
+      features: featuresArray,
+      coordinates: coord,
+    },
     user: {
       name: username,
       email,
       avatar,
       password,
       type: userType
-    },
-    coordinates: coord,
+    }
   };
 };

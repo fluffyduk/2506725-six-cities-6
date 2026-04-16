@@ -1,6 +1,6 @@
 import { createReadStream } from 'node:fs';
 import { FileReader } from './file-reader.interface.js';
-import { Offer } from '../../types/index.js';
+import { ParsedLine } from '../../types/index.js';
 import { createOffer } from '../../helpers/index.js';
 import { EventEmitter } from 'node:events';
 
@@ -38,7 +38,11 @@ export class TsvFileReader extends EventEmitter implements FileReader {
     }
   }
 
-  public toArray(): Offer[] {
+  public toArray(): ParsedLine[] {
+    if (!this.rawData) {
+      throw new Error('No data to parse. Please call read() method first.');
+    }
+
     return this.rawData
       .split('\n')
       .filter((row) => row.trim().length > 0)

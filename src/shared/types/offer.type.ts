@@ -1,5 +1,3 @@
-import { User } from './user.type.js';
-
 export const OfferCityEnum = {
   Paris: 'Paris',
   Cologne: 'Cologne',
@@ -45,6 +43,6 @@ export type Offer = {
     guests: number;
     price: number;
     features: OfferFeatureType[];
-    user: User;
+    authorId: string;
     coordinates: [number, number];
 };

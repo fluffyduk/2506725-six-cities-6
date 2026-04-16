@@ -12,9 +12,7 @@ import {
   OfferFeatureType,
   OfferType,
   OfferTypeEmum,
-  User,
 } from '../../types/index.js';
-import { UserEntity } from '../user/user.entity.js';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-declaration-merging
 export interface OfferEntity extends defaultClasses.Base {}
@@ -84,8 +82,8 @@ export class OfferEntity extends defaultClasses.TimeStamps implements Offer {
   @prop({ required: true, type: () => [String], enum: OfferFeatureEnum })
     features: OfferFeatureType[];
 
-  @prop({ required: true, type: () => UserEntity })
-    user: User;
+  @prop({ required: true, type: () => String })
+    authorId: string;
 
   @prop({ required: true, type: () => [Number], default: [0, 0] })
     coordinates: [number, number];

@@ -1,8 +1,8 @@
-import { IsDateString, IsInt, IsMongoId, IsString } from "class-validator";
+import { IsDateString, IsInt, IsMongoId, IsString } from 'class-validator';
 
 export class CreateCommentDto {
     @IsMongoId()
-    public authorId: string;
+  public authorId: string;
 
     @IsString()
     public text: string;

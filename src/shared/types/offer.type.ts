@@ -1,5 +1,3 @@
-import { User } from './user.type.js';
-
 export const OfferCityEnum = {
   Paris: 'Paris',
   Cologne: 'Cologne',

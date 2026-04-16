@@ -1,10 +1,10 @@
-import { IsArray, IsBoolean, IsDateString, IsEnum, IsInt, IsMongoId, IsOptional, IsString } from "class-validator";
-import { OfferCityEnum, OfferFeatureEnum, OfferTypeEmum } from "../../../types/index.ts";
+import { IsArray, IsBoolean, IsDateString, IsEnum, IsInt, IsMongoId, IsOptional, IsString } from 'class-validator';
+import { OfferCityEnum, OfferFeatureEnum, OfferTypeEmum } from '../../../types/index.ts';
 
 export class UpdateOfferDto {
     @IsOptional()
     @IsString()
-    public name?: string;
+  public name?: string;
 
     @IsOptional()
     @IsString()

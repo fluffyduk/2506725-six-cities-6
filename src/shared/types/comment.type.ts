@@ -1,8 +1,8 @@
 import { User } from './user.type.ts';
 
-export type Comment = {
+export type CommentType = {
     text: string;
-    createdAt: string;
+    date: Date;
     rating: number;
-    author: User;
+    authorId: string;
 }

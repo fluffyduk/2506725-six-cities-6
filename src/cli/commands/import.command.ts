@@ -7,99 +7,103 @@ import { DatabaseClient } from '../../shared/libs/database-client/database-clien
 import { Logger } from '../../shared/libs/logger/logger.interface.js';
 import { DefaultUserService } from '../../shared/modules/user/default-user.service.js';
 import { MongoDatabaseClient } from '../../shared/libs/database-client/mongo.database-client.js';
-import { Offer } from '../../shared/types/offer.type.js';
 import { DEFAULT_DB_PORT, DEFAULT_USER_PASSWORD } from './command.constant.js';
 import { OfferService } from '../../shared/modules/offer/offer-service.interface.js';
 import { ConsoleLogger } from '../../shared/libs/logger/console.logger.js';
 import { DefaultOfferService } from '../../shared/modules/offer/default-offer.service.js';
 import { OfferModel } from '../../shared/modules/offer/offer.entity.js';
 import { UserModel } from '../../shared/modules/user/user.entity.js';
+import { CommentModel } from '../../shared/modules/comments/comment.entity.js';
+import { ParsedLine } from '../../shared/types/index.js';
 
 export class ImportCommand implements Command {
-  private userService: UserService;
-  private offerService: OfferService;
-  private databaseClient: DatabaseClient;
-  private logger: Logger;
-  private salt: string;
+    private userService: UserService;
+    private offerService: OfferService;
+    private databaseClient: DatabaseClient;
+    private logger: Logger;
+    private salt: string;
 
-  constructor() {
-    this.logger = new ConsoleLogger();
-    this.offerService = new DefaultOfferService(this.logger, OfferModel);
-    this.userService = new DefaultUserService(this.logger, UserModel);
-    this.databaseClient = new MongoDatabaseClient(this.logger);
-  }
-
-  public getName(): string {
-    return '--import';
-  }
-
-  private async saveOffer(offer: Offer) {
-    const user = await this.userService.findOrCreate(
-      {
-        ...offer.user,
-        password: DEFAULT_USER_PASSWORD,
-      },
-      this.salt
-    );
-
-    await this.offerService.create({
-      user: user,
-      name: offer.name,
-      description: offer.description,
-      images: offer.images,
-      date: offer.date.toISOString(),
-      price: offer.price,
-      type: offer.type,
-      city: offer.city,
-      preview: offer.preview,
-      isPremium: offer.isPremium,
-      isFavorite: offer.isFavorite,
-      rating: offer.rating,
-      rooms: offer.rooms,
-      guests: offer.guests,
-      features: offer.features,
-      coordinates: offer.coordinates,
-    });
-  }
-
-  private async onImportedLine(line: string): Promise<void> {
-    const offer = createOffer(line);
-    await this.saveOffer(offer);
-  }
-
-  public async onImportEnd(totalLines: number): Promise<void> {
-    console.info(
-      chalk.green(
-        `Import completed successfully! Total lines: ${chalk.yellow(totalLines)}`
-      )
-    );
-    await this.databaseClient.disconnect();
-  }
-
-  public async execute(
-    filePath: string,
-    login: string,
-    password: string,
-    host: string,
-    dbname: string,
-    salt: string
-  ): Promise<void> {
-    const uri = getMongoURI(login, password, host, DEFAULT_DB_PORT, dbname);
-    this.salt = salt;
-
-    await this.databaseClient.connect(uri);
-    const fileReader = new TsvFileReader(filePath.trim());
-
-    fileReader.on('line', async (line, resolve) => {
-      await this.onImportedLine(line);
-      resolve();
-    });
-    fileReader.on('end', (totalLines) => this.onImportEnd(totalLines));
-
-    try {
-      await fileReader.read();
-    } catch (error) {
-      console.error(chalk.red(`Error reading file: ${getErrorMessage(error)}`));
+    constructor() {
+        this.logger = new ConsoleLogger();
+        this.offerService = new DefaultOfferService(this.logger, OfferModel, CommentModel, UserModel);
+        this.userService = new DefaultUserService(this.logger, UserModel);
+        this.databaseClient = new MongoDatabaseClient(this.logger);
+        this.salt = process.env.SALT ?? 'default-salt';
     }
-  }
+
+    public getName(): string {
+        return '--import';
+    }
+
+    private async saveOffer({ offer, user }: ParsedLine) {
+        const existingUser = await this.userService.findOrCreate(
+            {
+                ...user,
+                password: DEFAULT_USER_PASSWORD,
+            },
+            this.salt
+        );
+
+        await this.offerService.create({
+            name: offer.name,
+            description: offer.description,
+            date: offer.date.toISOString(),
+            city: offer.city,
+            preview: offer.preview,
+            images: offer.images,
+            isPremium: offer.isPremium,
+            isFavorite: offer.isFavorite,
+            rating: offer.rating,
+            type: offer.type,
+            rooms: offer.rooms,
+            guests: offer.guests,
+            price: offer.price,
+            features: offer.features,
+            authorId: existingUser.id,
+            coordinates: offer.coordinates,
+        });
+    }
+
+    private async onImportedLine(line: string): Promise<void> {
+        try {
+            const parsed = createOffer(line);
+            await this.saveOffer(parsed);
+        } catch (error) {
+            console.error(`Ошибка на строке: ${line}`, error);
+        }
+    }
+
+    public async onImportEnd(totalLines: number): Promise<void> {
+        console.info(
+            chalk.green(
+                `Import completed successfully! Total lines: ${chalk.yellow(totalLines)}`
+            )
+        );
+        await this.databaseClient.disconnect();
+    }
+
+    public async execute(
+        filePath: string,
+        login: string,
+        password: string,
+        host: string,
+        dbname: string
+    ): Promise<void> {
+        const uri = getMongoURI(login, password, host, DEFAULT_DB_PORT, dbname);
+
+        await this.databaseClient.connect(uri);
+        const fileReader = new TsvFileReader(filePath.trim());
+
+        fileReader.on('line', async (line, resolve) => {
+            await this.onImportedLine(line);
+            resolve();
+        });
+        fileReader.on('end', (totalLines) => this.onImportEnd(totalLines));
+
+        try {
+            await fileReader.read();
+        } catch (error) {
+            console.error(chalk.red(`Error reading file: ${getErrorMessage(error)}`));
+        }
+    }
 }

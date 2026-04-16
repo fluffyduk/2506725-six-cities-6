@@ -11,7 +11,6 @@ import {
   OfferCityEnum,
   OfferFeatureEnum,
   OfferTypeEmum,
-  User,
 } from '../../../types/index.js';
 
 export class CreateOfferDto {
@@ -58,7 +57,7 @@ export class CreateOfferDto {
   public features: string[];
 
   @IsMongoId()
-  public user: User;
+  public authorId: string;
 
   @IsArray()
   public coordinates: number[];

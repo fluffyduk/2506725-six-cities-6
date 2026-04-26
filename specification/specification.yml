@@ -15,7 +15,7 @@ tags:
     description: Действия для авторизации, регистрации и контроля токенов.
 
 paths:
-  /auth/register:
+  /users/register:
     post:
       tags:
         - auth
@@ -41,7 +41,7 @@ paths:
         "409":
           description: Пользователь с таким email уже существует!
 
-  /auth/login:
+  /users/login:
     post:
       tags:
         - auth
@@ -75,7 +75,7 @@ paths:
         "400":
           description: Неверный формат данных!
 
-  /auth/logout:
+  /users/logout:
     post:
       tags:
         - auth
@@ -89,7 +89,7 @@ paths:
         "401":
           description: Пользователь не авторизован!
 
-  /auth/refresh:
+  /users/refresh:
     post:
       tags:
         - auth

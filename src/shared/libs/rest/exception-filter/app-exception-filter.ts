@@ -9,45 +9,45 @@ import { createErrorObject } from '../../../helpers/common.js';
 
 @injectable()
 export class AppExpectionFilter implements ExceptionFilter {
-    constructor(@inject(Component.Logger) private readonly logger: Logger) {
-        this.logger.info('Register AppExceptionFilter');
+  constructor(@inject(Component.Logger) private readonly logger: Logger) {
+    this.logger.info('Register AppExceptionFilter');
+  }
+
+  public catch(
+    error: Error,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): void {
+    if (error instanceof HttpError) {
+      return this.handleHttpError(error, req, res, next);
     }
 
-    public catch(
-        error: Error,
-        req: Request,
-        res: Response,
-        next: NextFunction
-    ): void {
-        if (error instanceof HttpError) {
-            return this.handleHttpError(error, req, res, next);
-        }
+    this.handleOtherError(error, req, res, next);
+  }
 
-        this.handleOtherError(error, req, res, next);
-    }
+  private handleHttpError(
+    error: HttpError,
+    _req: Request,
+    res: Response,
+    _next: NextFunction
+  ) {
+    this.logger.error(
+      `[${error.detail}]: ${error.httpStatusCode} — ${error.message}`,
+      error
+    );
+    res.status(error.httpStatusCode).json(createErrorObject(error.message));
+  }
 
-    private handleHttpError(
-        error: HttpError,
-        _req: Request,
-        res: Response,
-        _next: NextFunction
-    ) {
-        this.logger.error(
-            `[${error.detail}]: ${error.httpStatusCode} — ${error.message}`,
-            error
-        );
-        res.status(error.httpStatusCode).json(createErrorObject(error.message));
-    }
-
-    private handleOtherError(
-        error: Error,
-        _req: Request,
-        res: Response,
-        _next: NextFunction
-    ): void {
-        this.logger.error(error.message, error);
-        res
-            .status(StatusCodes.INTERNAL_SERVER_ERROR)
-            .json({ error: error.message });
-    }
+  private handleOtherError(
+    error: Error,
+    _req: Request,
+    res: Response,
+    _next: NextFunction
+  ): void {
+    this.logger.error(error.message, error);
+    res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: error.message });
+  }
 }

@@ -16,8 +16,8 @@ export function createOfferContainer(): ContainerModule {
       OfferModel
     );
     bind<BaseController>(Component.OfferController)
-        .to(OfferController)
-        .inSingletonScope();
+      .to(OfferController)
+      .inSingletonScope();
   });
   return offerContainer;
 }

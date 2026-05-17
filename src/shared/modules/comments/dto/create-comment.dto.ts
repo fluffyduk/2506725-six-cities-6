@@ -3,7 +3,7 @@ import { CreateCommentValidationMessage } from './create-comment.message.ts';
 
 export class CreateCommentDto {
     @IsMongoId({message: CreateCommentValidationMessage.authorId.invalidFormat})
-    public authorId: string;
+  public authorId: string;
 
     @IsString({message: CreateCommentValidationMessage.text.invalidFormat})
     @Length(5, 1024, {message: CreateCommentValidationMessage.text.invalidLength})

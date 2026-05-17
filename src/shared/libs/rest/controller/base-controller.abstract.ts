@@ -28,13 +28,11 @@ export abstract class BaseController implements Controller {
     const handler = route.handler.bind(this);
     const wrapperAsyncHandler = this.asyncHandler(handler);
 
-    const middlewareHandlers = route.middlewares?.map((item) => {
-        return this.asyncHandler(item.execute.bind(item));
-    });
+    const middlewareHandlers = route.middlewares?.map((item) => this.asyncHandler(item.execute.bind(item)));
 
     const allHandlers = middlewareHandlers
-        ? [...middlewareHandlers, wrapperAsyncHandler]
-        : wrapperAsyncHandler
+      ? [...middlewareHandlers, wrapperAsyncHandler]
+      : wrapperAsyncHandler;
 
     this._router[route.method](route.path, allHandlers);
     this.logger.info(

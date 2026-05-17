@@ -11,6 +11,6 @@ export * from './types/route.interface.ts';
 export * from './types/request-body.type.ts';
 export * from './types/request.params.type.ts';
 
-export * from './middleware/middleware.interface.ts'
+export * from './middleware/middleware.interface.ts';
 export * from './middleware/validate-dto.middleware.ts';
 export * from './middleware/validate-object.middleware.ts';

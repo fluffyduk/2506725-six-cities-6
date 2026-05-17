@@ -3,7 +3,7 @@ import { OfferCityType, OfferFeatureType } from '../../../types/index.ts';
 
 export class OfferRdo {
     @Expose()
-    public id: string;
+  public id: string;
 
     @Expose()
     public name: string;

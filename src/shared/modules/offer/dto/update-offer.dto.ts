@@ -7,7 +7,7 @@ export class UpdateOfferDto {
     @IsString({ message: OfferValidationMessage.name.invalidFormat })
     @MinLength(10, { message: OfferValidationMessage.name.minLength })
     @MaxLength(100, { message: OfferValidationMessage.name.maxLength })
-    public name?: string;
+  public name?: string;
 
     @IsOptional()
     @IsString({ message: OfferValidationMessage.description.invalidFormat })
@@ -71,8 +71,8 @@ export class UpdateOfferDto {
     @IsOptional()
     @IsArray({ message: OfferValidationMessage.features.invalidFormat })
     @IsEnum(OfferFeatureEnum, {
-        each: true,
-        message: OfferValidationMessage.features.invalidId
+      each: true,
+      message: OfferValidationMessage.features.invalidId
     })
     public features?: OfferFeatureType[];
 

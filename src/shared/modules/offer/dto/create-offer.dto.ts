@@ -1,25 +1,25 @@
 import {
-    ArrayMaxSize,
-    ArrayMinSize,
-    IsArray,
-    IsBoolean,
-    IsDateString,
-    IsEnum,
-    IsInt,
-    IsMongoId,
-    IsString,
-    Max,
-    MaxLength,
-    Min,
-    MinLength,
+  ArrayMaxSize,
+  ArrayMinSize,
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsEnum,
+  IsInt,
+  IsMongoId,
+  IsString,
+  Max,
+  MaxLength,
+  Min,
+  MinLength,
 } from 'class-validator';
 import {
-    OfferCityEnum,
-    OfferCityType,
-    OfferFeatureEnum,
-    OfferFeatureType,
-    OfferType,
-    OfferTypeEmum,
+  OfferCityEnum,
+  OfferCityType,
+  OfferFeatureEnum,
+  OfferFeatureType,
+  OfferType,
+  OfferTypeEmum,
 } from '../../../types/index.js';
 import { OfferValidationMessage } from './offer.message.js';
 
@@ -27,7 +27,7 @@ export class CreateOfferDto {
     @IsString({ message: OfferValidationMessage.name.invalidFormat })
     @MinLength(10, { message: OfferValidationMessage.name.minLength })
     @MaxLength(100, { message: OfferValidationMessage.name.maxLength })
-    public name: string;
+  public name: string;
 
     @IsString({ message: OfferValidationMessage.description.invalidFormat })
     @MinLength(20, { message: OfferValidationMessage.description.minLength })
@@ -78,8 +78,8 @@ export class CreateOfferDto {
 
     @IsArray({ message: OfferValidationMessage.features.invalidFormat })
     @IsEnum(OfferFeatureEnum, {
-        each: true,
-        message: OfferValidationMessage.features.invalidId
+      each: true,
+      message: OfferValidationMessage.features.invalidId
     })
     public features: OfferFeatureType[];
 

@@ -1,10 +1,10 @@
-import { IsEmail, IsEnum, IsOptional, IsString, Length } from "class-validator";
-import { CreateUserValidationMessages } from "./create-user.messages";
-import { UserType, UserTypeEnum } from "../../../types/index.ts";
+import { IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
+import { CreateUserValidationMessages } from './create-user.messages';
+import { UserType, UserTypeEnum } from '../../../types/index.ts';
 
 export class CreateUserDto {
     @IsEmail({}, { message: CreateUserValidationMessages.email.invalidFormat })
-    public email: string;
+  public email: string;
 
     @IsOptional()
     @IsString()

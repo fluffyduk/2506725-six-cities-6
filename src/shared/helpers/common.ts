@@ -3,40 +3,40 @@ import { HttpError, RequestParams } from '../libs/rest/index.ts';
 import { StatusCodes } from 'http-status-codes';
 
 export function generateRandomInteger(min: number, max: number, numAfterDigit = 0) {
-    return +((Math.random() * (max - min)) + min).toFixed(numAfterDigit);
+  return +((Math.random() * (max - min)) + min).toFixed(numAfterDigit);
 }
 
 export function getRandomItems<T>(items: T[]): T[] {
-    const startPosition = generateRandomInteger(0, items.length - 1);
-    const endPosition = startPosition + generateRandomInteger(startPosition, items.length);
-    return items.slice(startPosition, endPosition);
+  const startPosition = generateRandomInteger(0, items.length - 1);
+  const endPosition = startPosition + generateRandomInteger(startPosition, items.length);
+  return items.slice(startPosition, endPosition);
 }
 
 export function getRandomItem<T>(items: T[]): T {
-    return items[generateRandomInteger(0, items.length - 1)];
+  return items[generateRandomInteger(0, items.length - 1)];
 }
 
 export const getErrorMessage = (error: unknown): string =>
-    error instanceof Error ? error.message : String(error);
+  error instanceof Error ? error.message : String(error);
 
 export const includes = <T>(array: readonly T[], value: unknown): boolean =>
-    (array as readonly unknown[]).includes(value);
+  (array as readonly unknown[]).includes(value);
 
 export const fillDTO = <T, V>(someDTO: ClassConstructor<T>, plainObject: V) =>
-    plainToInstance(someDTO, plainObject, { excludeExtraneousValues: true });
+  plainToInstance(someDTO, plainObject, { excludeExtraneousValues: true });
 
 export const createErrorObject = (message: string) => ({
-    error: message,
+  error: message,
 });
 
 export const getId = (params: RequestParams): string => {
-    const { offerId } = params;
-    if (typeof offerId !== 'string') {
-        throw new HttpError(
-            StatusCodes.BAD_REQUEST,
-            `Некорректный ID: ${offerId}`
-        )
-    }
+  const { offerId } = params;
+  if (typeof offerId !== 'string') {
+    throw new HttpError(
+      StatusCodes.BAD_REQUEST,
+      `Некорректный ID: ${offerId}`
+    );
+  }
 
-    return offerId;
+  return offerId;
 };

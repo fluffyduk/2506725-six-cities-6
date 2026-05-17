@@ -5,6 +5,9 @@ import { Logger } from '../../libs/logger/logger.interface.ts';
 import { DocumentType, types } from '@typegoose/typegoose';
 import { CommentEntity } from './comment.entity.ts';
 import { CreateCommentDto } from './dto/create-comment.dto.ts';
+import { SortType } from '../../types/sort-type.enum.ts';
+
+const COMMENT_LIMIT = 50;
 
 export class DefaultCommentService implements CommentService {
   constructor(
@@ -18,7 +21,15 @@ export class DefaultCommentService implements CommentService {
     return result;
   }
 
-  findByCommentId(commentId: string): Promise<DocumentType<CommentEntity> | null> {
-    return this.commentModel.findById(commentId).exec();
+  async find(offerId: string): Promise<DocumentType<CommentEntity>[]> {
+    this.logger.info(`Поиск комментариев к предложению ${offerId}`);
+    const comments = await this.commentModel
+      .find({ offerId })
+      .sort({ createdAt: SortType.Desc })
+      .limit(COMMENT_LIMIT)
+      .exec();
+
+    this.logger.info(`Найдены комментарии: ${comments.join()}`);
+    return comments;
   }
 }

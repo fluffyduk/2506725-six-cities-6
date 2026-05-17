@@ -26,14 +26,22 @@ Content-Type: application/json
 ###
 
 ## Получить предложение по id
-GET http://localhost:4000/offers/69da33e4bbece92e2987df77 HTTP/1.1
+GET http://localhost:4000/offers/69da33e4bbece92e29 HTTP/1.1
 Content-Type: application/json
 
 ###
 
 ## Изменить предложение по id
-PATCH  http://localhost:4000/offers/69da33e4bbece92e2987df77 HTTP/1.1
+PATCH  http://localhost:4000/offers/69da33e4bbece92e29 HTTP/1.1
 Content-Type: application/json
 {
-  "name": "Не очень уютный домик на остове",
+  "name": "Ужасное место для сна!",
 }
+
+###
+
+## Удалить предложение
+DELETE  http://localhost:4000/offers/69da33e4bbece92e29 HTTP/1.1
+Content-Type: application/json
+
+###

@@ -34,6 +34,9 @@ export class CommentEntity extends defaultClasses.TimeStamps implements CommentT
 
     @prop({ required: true, type: () => String })
       authorId: string;
+
+    @prop({ required: true, type: () => String })
+      offerId: string;
 }
 
 export const CommentModel = getModelForClass(CommentEntity);

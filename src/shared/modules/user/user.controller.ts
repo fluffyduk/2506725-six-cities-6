@@ -3,6 +3,7 @@ import {
   BaseController,
   HttpError,
   HttpMethod,
+  ValidateDtoMiddleware,
 } from '../../libs/rest/index.js';
 import { Component } from '../../types/index.js';
 import { Logger } from '../../libs/logger/index.js';
@@ -17,6 +18,7 @@ import { LogoutUserRequest } from './requests/logout-user-request.type.ts';
 import { RefreshUserRequest } from './requests/refresh-user-request.type.ts';
 import { MeUserRequest } from './requests/me-user-request.type.ts';
 import { CreateUserRequest } from './requests/create-user-request.type.js';
+import { CreateUserDto, LoginUserDto } from './index.ts';
 
 @injectable()
 export class UserController extends BaseController {
@@ -32,12 +34,14 @@ export class UserController extends BaseController {
       path: '/register',
       method: HttpMethod.Post,
       handler: this.create,
+      middlewares: [new ValidateDtoMiddleware(CreateUserDto)],
     });
 
     this.addRoute({
       path: '/login',
       method: HttpMethod.Post,
       handler: this.login,
+      middlewares: [new ValidateDtoMiddleware(LoginUserDto)],
     });
 
     this.addRoute({

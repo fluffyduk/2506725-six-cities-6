@@ -9,6 +9,7 @@ export interface OfferService {
     updateById(offerId: string, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null>;
     deleteById(offerId: string): Promise<DeleteResult>;
     find(): Promise<DocumentType<OfferEntity>[]>;
+    findPremium(): Promise<DocumentType<OfferEntity>[]>;
     findByOfferId(offerId: string): Promise<DocumentType<OfferEntity> | null>;
     findByOfferName(offerName: string): Promise<DocumentType<OfferEntity> | null>;
     findByOfferNameOrCreate(

@@ -1,4 +1,6 @@
 import { ClassConstructor, plainToInstance } from 'class-transformer';
+import { HttpError, RequestParams } from '../libs/rest/index.ts';
+import { StatusCodes } from 'http-status-codes';
 
 export function generateRandomInteger(min: number, max: number, numAfterDigit = 0) {
   return +((Math.random() * (max - min)) + min).toFixed(numAfterDigit);
@@ -26,3 +28,15 @@ export const fillDTO = <T, V>(someDTO: ClassConstructor<T>, plainObject: V) =>
 export const createErrorObject = (message: string) => ({
   error: message,
 });
+
+export const getId = (params: RequestParams): string => {
+  const { offerId } = params;
+  if (typeof offerId !== 'string') {
+    throw new HttpError(
+      StatusCodes.BAD_REQUEST,
+      `Некорректный ID: ${offerId}`
+    );
+  }
+
+  return offerId;
+};

@@ -132,4 +132,12 @@ export class DefaultOfferService implements OfferService {
   public async exists(documentId: string): Promise<boolean> {
     return (await this.offerModel.exists({ _id: documentId })) !== null;
   }
+
+  public async findPremium(): Promise<DocumentType<OfferEntity>[]> {
+    return this.offerModel
+      .find({isPremium: true})
+      .sort({createdAt: SortType.Desc})
+      .limit(DEFAULT_OFFER_COUNT)
+      .exec();
+  }
 }

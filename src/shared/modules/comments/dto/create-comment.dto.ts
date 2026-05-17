@@ -1,15 +1,19 @@
-import { IsDateString, IsInt, IsMongoId, IsString } from 'class-validator';
+import { IsInt, IsMongoId, IsString, Length, Max, Min } from 'class-validator';
+import { CreateCommentValidationMessage } from './create-comment.message.ts';
 
 export class CreateCommentDto {
-    @IsMongoId()
+    @IsMongoId({message: CreateCommentValidationMessage.authorId.invalidFormat})
   public authorId: string;
 
-    @IsString()
+    @IsString({message: CreateCommentValidationMessage.text.invalidFormat})
+    @Length(5, 1024, {message: CreateCommentValidationMessage.text.invalidLength})
     public text: string;
 
     @IsInt()
+    @Min(1)
+    @Max(5)
     public rating: number;
 
-    @IsDateString()
-    public date: string;
+    @IsMongoId({message: CreateCommentValidationMessage.offerId.invalidFormat})
+    public offerId: string;
 }

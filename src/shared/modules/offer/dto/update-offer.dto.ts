@@ -1,68 +1,88 @@
-import { IsArray, IsBoolean, IsDateString, IsEnum, IsInt, IsMongoId, IsOptional, IsString } from 'class-validator';
-import { OfferCityEnum, OfferFeatureEnum, OfferTypeEmum } from '../../../types/index.ts';
+import { ArrayMaxSize, ArrayMinSize, IsArray, IsBoolean, IsDateString, IsEnum, IsInt, IsMongoId, IsOptional, IsString, Max, MaxLength, Min, MinLength } from 'class-validator';
+import { OfferCityEnum, OfferCityType, OfferFeatureEnum, OfferFeatureType, OfferType, OfferTypeEmum } from '../../../types/index.ts';
+import { OfferValidationMessage } from './offer.message.ts';
 
 export class UpdateOfferDto {
     @IsOptional()
-    @IsString()
+    @IsString({ message: OfferValidationMessage.name.invalidFormat })
+    @MinLength(10, { message: OfferValidationMessage.name.minLength })
+    @MaxLength(100, { message: OfferValidationMessage.name.maxLength })
   public name?: string;
 
     @IsOptional()
-    @IsString()
+    @IsString({ message: OfferValidationMessage.description.invalidFormat })
+    @MinLength(20, { message: OfferValidationMessage.description.minLength })
+    @MaxLength(1024, { message: OfferValidationMessage.description.maxLength })
     public description?: string;
 
     @IsOptional()
-    @IsDateString()
+    @IsDateString({}, { message: OfferValidationMessage.date.invalidFormat })
     public date?: string;
 
     @IsOptional()
-    @IsEnum(OfferCityEnum)
-    public city?: string;
+    @IsEnum(OfferCityEnum, { message: OfferValidationMessage.city.invalidType })
+    public city?: OfferCityType;
 
     @IsOptional()
-    @IsString()
+    @IsString({ message: OfferValidationMessage.preview.invalidFormat })
     public preview?: string;
 
     @IsOptional()
-    @IsArray()
+    @IsArray({ message: OfferValidationMessage.images.invalidFormat })
+    @IsString({ each: true })
     public images?: string[];
 
     @IsOptional()
-    @IsBoolean()
+    @IsBoolean({ message: OfferValidationMessage.isPremium.invalidFormat })
     public isPremium?: boolean;
 
     @IsOptional()
-    @IsBoolean()
+    @IsBoolean({ message: OfferValidationMessage.isFavorite.invalidFormat })
     public isFavorite?: boolean;
 
     @IsOptional()
-    @IsInt()
+    @IsInt({ message: OfferValidationMessage.rating.invalidFormat })
+    @Min(1, { message: OfferValidationMessage.rating.min })
+    @Max(5, { message: OfferValidationMessage.rating.max })
     public rating?: number;
 
     @IsOptional()
-    @IsEnum(OfferTypeEmum)
-    public type?: string;
+    @IsEnum(OfferTypeEmum, { message: OfferValidationMessage.type.invalidType })
+    public type?: OfferType;
 
     @IsOptional()
-    @IsInt()
+    @IsInt({ message: OfferValidationMessage.rooms.invalidFormat })
+    @Min(1, { message: OfferValidationMessage.rooms.min })
+    @Max(8, { message: OfferValidationMessage.rooms.max })
     public rooms?: number;
 
     @IsOptional()
-    @IsInt()
+    @IsInt({ message: OfferValidationMessage.guests.invalidFormat })
+    @Min(1, { message: OfferValidationMessage.guests.min })
+    @Max(10, { message: OfferValidationMessage.guests.max })
     public guests?: number;
 
     @IsOptional()
-    @IsInt()
+    @IsInt({ message: OfferValidationMessage.price.invalidFormat })
+    @Min(100, { message: OfferValidationMessage.price.min })
+    @Max(200000, { message: OfferValidationMessage.price.max })
     public price?: number;
 
     @IsOptional()
-    @IsEnum(OfferFeatureEnum)
-    public features?: string[];
+    @IsArray({ message: OfferValidationMessage.features.invalidFormat })
+    @IsEnum(OfferFeatureEnum, {
+      each: true,
+      message: OfferValidationMessage.features.invalidId
+    })
+    public features?: OfferFeatureType[];
 
     @IsOptional()
-    @IsMongoId()
+    @IsMongoId({ message: OfferValidationMessage.authorId.invalidId })
     public authorId?: string;
 
     @IsOptional()
-    @IsArray()
+    @IsArray({ message: OfferValidationMessage.coordinates.invalidFormat })
+    @ArrayMinSize(2, { message: OfferValidationMessage.coordinates.arraySize })
+    @ArrayMaxSize(2, { message: OfferValidationMessage.coordinates.arraySize })
     public coordinates?: number[];
 }

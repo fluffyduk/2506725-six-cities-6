@@ -4,3 +4,4 @@ export * from './user.type.ts';
 export * from './component.enum.ts';
 export * from './parsed-offer.type.ts';
 export * from './sort-type.enum.ts';
+export * from './document-exists.interface.ts';

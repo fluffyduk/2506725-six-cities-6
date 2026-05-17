@@ -14,3 +14,5 @@ export * from './types/request.params.type.ts';
 export * from './middleware/middleware.interface.ts';
 export * from './middleware/validate-dto.middleware.ts';
 export * from './middleware/validate-object.middleware.ts';
+export * from './middleware/document-exists.middleware.ts';
+export * from './middleware/upload-file.middleware.ts';

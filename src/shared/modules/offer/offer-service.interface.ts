@@ -3,8 +3,9 @@ import { CreateOfferDto } from './dto/create-offer.dto.js';
 import { OfferEntity } from './offer.entity.js';
 import { DeleteResult } from 'mongoose';
 import { UpdateOfferDto } from './dto/update-offer.dto.js';
+import { DocumentExists } from '../../types/document-exists.interface.js';
 
-export interface OfferService {
+export interface OfferService extends DocumentExists {
     create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>>;
     updateById(offerId: string, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null>;
     deleteById(offerId: string): Promise<DeleteResult>;

@@ -3,9 +3,11 @@ import { CreateUserDto } from './dto/create-user.dto.ts';
 import { UserService } from './user-service.interface.ts';
 import { UserEntity } from './user.entity.ts';
 import { inject, injectable } from 'inversify';
-import { Component, User } from '../../types/index.ts';
+import { Component } from '../../types/index.ts';
 import { Logger } from '../../libs/logger/index.ts';
 import { OfferEntity } from '../offer/index.ts';
+import { UpdateUserDto } from './dto/update-user.dto.ts';
+import { DEFAULT_AVATAR_FILE_NAME } from './user.constant.ts';
 
 @injectable()
 export class DefaultUserService implements UserService {
@@ -15,7 +17,7 @@ export class DefaultUserService implements UserService {
   ) { }
 
   public async create(dto: CreateUserDto, salt: string): Promise<DocumentType<UserEntity>> {
-    const user = new UserEntity(dto as User);
+    const user = new UserEntity({ ...dto, avatar: DEFAULT_AVATAR_FILE_NAME });
     user.setPassword(dto.password, salt);
 
     const result = this.userModel.create(user);
@@ -68,6 +70,15 @@ export class DefaultUserService implements UserService {
   public async deleteFavorite(userId: string, offerId: string): Promise<void> {
     await this.userModel.findByIdAndUpdate(userId, {
       $pull: { favorites: offerId },
+    });
+  }
+
+  public async updateById(
+    id: string,
+    dto: UpdateUserDto
+  ): Promise<DocumentType<UserEntity> | null> {
+    return this.userModel.findOneAndUpdate({ _id: id }, dto, {
+      returnDocument: 'after',
     });
   }
 }

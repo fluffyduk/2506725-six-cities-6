@@ -23,6 +23,7 @@ import { CreateUserRequest } from './requests/create-user-request.type.js';
 import { CreateUserDto, LoginUserDto } from './index.ts';
 import { AuthService } from '../auth/auth-service.interface.ts';
 import { LoggedUserRdo } from './rdo/logged-user.rdo.ts';
+import { UploadUserAvatarRdo } from './rdo/upload-user-avatar.rdo.ts';
 
 @injectable()
 export class UserController extends BaseController {
@@ -103,11 +104,8 @@ export class UserController extends BaseController {
     const user = await this.authService.verify(body);
     const token = await this.authService.authenticate(user);
 
-    const responseData = fillDTO(LoggedUserRdo, {
-      email: user.email,
-      token,
-    });
-    this.ok(res, responseData);
+    const responseData = fillDTO(LoggedUserRdo, user);
+    this.ok(res, Object.assign(responseData, { token }));
   }
 
   public async logout(
@@ -125,7 +123,17 @@ export class UserController extends BaseController {
   }
 
   public async uploadAvatar(req: Request, res: Response): Promise<void> {
-    this.created(res, { filepath: req.file?.path });
+    const userId = req.params.userId;
+    if (typeof userId !== 'string') {
+      throw new HttpError(StatusCodes.BAD_REQUEST, 'incorrect user id');
+    }
+    const uploadFile = { avatar: req.file?.filename };
+
+    await this.userService.updateById(userId, uploadFile);
+    this.created(
+      res,
+      fillDTO(UploadUserAvatarRdo, { avatar: uploadFile.avatar })
+    );
   }
 
   public async checkAuthenticate(

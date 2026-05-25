@@ -4,7 +4,11 @@ import {
   DocumentExistsMiddleware,
   HttpError,
   HttpMethod,
+  PathTransformer,
+  PathTransformerMiddleware,
   PrivateRouteMiddleware,
+  UploadFileMiddleware,
+  UploadMultipleFilesMiddleware,
   ValidateDtoMiddleware,
   ValidateObjectMiddleware,
 } from '../../libs/rest/index.js';
@@ -18,19 +22,34 @@ import { CreateOfferRequest } from './requests/create-offer-request.type.js';
 import { PatchOfferRequest } from './requests/patch-offer-request.type.js';
 import { UserService } from '../user/user-service.interface.ts';
 import { StatusCodes } from 'http-status-codes';
+import { Config } from '../../libs/config/config.interface.ts';
+import { RestSchema } from '../../libs/config/index.ts';
 
 @injectable()
 export class OfferController extends BaseController {
+  private readonly pathTransformerMiddleware: PathTransformerMiddleware;
+
   constructor(
         @inject(Component.Logger) protected readonly logger: Logger,
         @inject(Component.OfferService) private readonly offerService: OfferService,
-        @inject(Component.UserService) private readonly userService: UserService
+        @inject(Component.UserService) private readonly userService: UserService,
+        @inject(Component.PathTransformer) pathTransformer: PathTransformer,
+        @inject(Component.Config) private readonly configService: Config<RestSchema>
   ) {
     super(logger);
 
     this.logger.info('Register routes for OfferController…');
 
-    this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
+    this.pathTransformerMiddleware = new PathTransformerMiddleware(
+      pathTransformer
+    );
+
+    this.addRoute({
+      path: '/',
+      method: HttpMethod.Get,
+      handler: this.index,
+      middlewares: [this.pathTransformerMiddleware],
+    });
 
     this.addRoute({
       path: '/',
@@ -43,7 +62,11 @@ export class OfferController extends BaseController {
       path: '/:offerId',
       method: HttpMethod.Get,
       handler: this.get,
-      middlewares: [new ValidateObjectMiddleware('offerId'), new DocumentExistsMiddleware(offerService, 'Offer', 'offerId')],
+      middlewares: [
+        this.pathTransformerMiddleware,
+        new ValidateObjectMiddleware('offerId'),
+        new DocumentExistsMiddleware(offerService, 'Offer', 'offerId')
+      ],
     });
 
     this.addRoute({
@@ -94,6 +117,36 @@ export class OfferController extends BaseController {
       method: HttpMethod.Get,
       handler: this.favorites,
       middlewares: [new PrivateRouteMiddleware()],
+    });
+
+    this.addRoute({
+      path: '/:offerId/preview',
+      method: HttpMethod.Post,
+      handler: this.uploadPreview,
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new ValidateObjectMiddleware('offerId'),
+        new DocumentExistsMiddleware(offerService, 'Offer', 'offerId'),
+        new UploadFileMiddleware(
+          this.configService.get('UPLOAD_DIRECTORY'),
+          'preview'
+        ),
+      ],
+    });
+    this.addRoute({
+      path: '/:offerId/images',
+      method: HttpMethod.Post,
+      handler: this.uploadImages,
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new ValidateObjectMiddleware('offerId'),
+        new DocumentExistsMiddleware(offerService, 'Offer', 'offerId'),
+        new UploadMultipleFilesMiddleware(
+          this.configService.get('UPLOAD_DIRECTORY'),
+          'images',
+          6
+        ),
+      ],
     });
   }
 
@@ -178,5 +231,70 @@ export class OfferController extends BaseController {
   public async favorites(req: Request, res: Response): Promise<void> {
     const result = await this.userService.getFavorites(req.tokenPayload.id);
     this.ok(res, result);
+  }
+
+  public async uploadPreview({ params, file }: Request, res: Response) {
+    if (!file || typeof params.offerId !== 'string') {
+      throw new HttpError(
+        StatusCodes.BAD_REQUEST,
+        'Preview image is required',
+        'OfferController'
+      );
+    }
+
+    const updateDto = { preview: file.filename };
+    const result = await this.offerService.updateById(
+      params.offerId,
+      updateDto
+    );
+
+    this.created(res, fillDTO(OfferRdo, result));
+  }
+
+  public async uploadImages({ params, files }: Request, res: Response) {
+    const uploadedFiles = files as Express.Multer.File[];
+    if (
+      !uploadedFiles ||
+            uploadedFiles.length === 0 ||
+            typeof params.offerId !== 'string'
+    ) {
+      throw new HttpError(
+        StatusCodes.BAD_REQUEST,
+        'No images provided',
+        'OfferController'
+      );
+    }
+
+    const offer = await this.offerService.findByOfferId(params.offerId);
+
+    if (!offer) {
+      throw new HttpError(
+        StatusCodes.NOT_FOUND,
+        `Offer ${params.offerId} not found`,
+        'OfferController'
+      );
+    }
+
+    const currentImagesCount = offer.images.length;
+    const newImagesCount = uploadedFiles.length;
+
+    if (currentImagesCount + newImagesCount > 6) {
+      throw new HttpError(
+        StatusCodes.BAD_REQUEST,
+        `Cannot upload ${newImagesCount} images. Current: ${currentImagesCount}, max: 6`,
+        'OfferController'
+      );
+    }
+
+    const newImageFilenames = uploadedFiles.map((file) => file.filename);
+    const updatedImages = [...offer.images, ...newImageFilenames];
+
+    const updateDto = { images: updatedImages };
+    const result = await this.offerService.updateById(
+      params.offerId,
+      updateDto
+    );
+
+    this.created(res, fillDTO(OfferRdo, result));
   }
 }

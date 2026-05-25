@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
-import { CreateUserValidationMessages } from './create-user.messages';
+import { CreateUserValidationMessages } from './create-user.messages.ts';
 import { UserType, UserTypeEnum } from '../../../types/index.ts';
 
 export class CreateUserDto {

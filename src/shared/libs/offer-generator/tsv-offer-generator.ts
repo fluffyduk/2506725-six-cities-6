@@ -27,7 +27,6 @@ export class TSVOfferGenerator implements OfferGenerator {
     const previewPath = getRandomItem<string>(this.mockData.previewImages);
     const photos = getRandomItems<string>(this.mockData.photos);
     const isPremium = Math.random() < 0.5;
-    const isFavorite = Math.random() < 0.5;
     const rating = generateRandomInteger(1, 5, 1);
     const type = getRandomItem<string>(this.mockData.types);
     const roomsCount = generateRandomInteger(1, 5);
@@ -49,7 +48,6 @@ export class TSVOfferGenerator implements OfferGenerator {
       previewPath,
       photos.join(';'),
       isPremium,
-      isFavorite,
       rating,
       type,
       roomsCount,

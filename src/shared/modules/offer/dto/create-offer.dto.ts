@@ -6,7 +6,6 @@ import {
   IsDateString,
   IsEnum,
   IsInt,
-  IsMongoId,
   IsString,
   Max,
   MaxLength,
@@ -50,9 +49,6 @@ export class CreateOfferDto {
     @IsBoolean({ message: OfferValidationMessage.isPremium.invalidFormat })
     public isPremium: boolean;
 
-    @IsBoolean({ message: OfferValidationMessage.isFavorite.invalidFormat })
-    public isFavorite: boolean;
-
     @IsInt({ message: OfferValidationMessage.rating.invalidFormat })
     @Min(1, { message: OfferValidationMessage.rating.min })
     @Max(5, { message: OfferValidationMessage.rating.max })
@@ -83,7 +79,6 @@ export class CreateOfferDto {
     })
     public features: OfferFeatureType[];
 
-    @IsMongoId({ message: OfferValidationMessage.authorId.invalidId })
     public authorId: string;
 
     @IsArray({ message: OfferValidationMessage.coordinates.invalidFormat })

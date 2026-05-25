@@ -1,6 +1,7 @@
-import { defaultClasses, getModelForClass, modelOptions, prop } from '@typegoose/typegoose';
+import { defaultClasses, getModelForClass, modelOptions, mongoose, prop, Ref } from '@typegoose/typegoose';
 import { User, UserType, UserTypeEnum } from '../../types/index.ts';
 import { createSHA256 } from '../../helpers/index.ts';
+import { OfferEntity } from '../offer/index.ts';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-declaration-merging
 export interface UserEntity extends defaultClasses.Base { }
@@ -41,12 +42,25 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
     @prop({ required: true, default: '', type: String })
     private _password: string;
 
+    @prop({
+      type: () => [mongoose.Schema.Types.ObjectId],
+      ref: () => OfferEntity,
+      _id: false,
+      default: [],
+    })
+    public favorites: Ref<OfferEntity>[];
+
     public setPassword(password: string, salt: string) {
       this._password = createSHA256(password, salt);
     }
 
     public get password() {
       return this._password;
+    }
+
+    public verifyPassword(password: string, salt: string) {
+      const hashPassword = createSHA256(password, salt);
+      return hashPassword === this.password;
     }
 }
 

@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
-import { Controller } from './controller.interface';
-import { Logger } from '../../logger';
+import { Controller } from './controller.interface.ts';
+import { Logger } from '../../logger/index.ts';
 import {
   NextFunction,
   RequestHandler,
@@ -8,7 +8,7 @@ import {
   Response,
   Router,
 } from 'express';
-import { Route } from '../types/route.interface';
+import { Route } from '../types/route.interface.ts';
 import { StatusCodes } from 'http-status-codes';
 
 const DEFAULT_CONTENT_TYPE = 'application/json';

@@ -37,10 +37,6 @@ export class UpdateOfferDto {
     public isPremium?: boolean;
 
     @IsOptional()
-    @IsBoolean({ message: OfferValidationMessage.isFavorite.invalidFormat })
-    public isFavorite?: boolean;
-
-    @IsOptional()
     @IsInt({ message: OfferValidationMessage.rating.invalidFormat })
     @Min(1, { message: OfferValidationMessage.rating.min })
     @Max(5, { message: OfferValidationMessage.rating.max })

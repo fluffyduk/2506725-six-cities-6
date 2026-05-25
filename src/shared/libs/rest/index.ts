@@ -16,3 +16,5 @@ export * from './middleware/validate-dto.middleware.ts';
 export * from './middleware/validate-object.middleware.ts';
 export * from './middleware/document-exists.middleware.ts';
 export * from './middleware/upload-file.middleware.ts';
+export * from './middleware/parse-token.middleware.ts';
+export * from './middleware/private-route.middleware.ts';

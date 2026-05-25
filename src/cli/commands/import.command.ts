@@ -7,14 +7,17 @@ import { DatabaseClient } from '../../shared/libs/database-client/database-clien
 import { Logger } from '../../shared/libs/logger/logger.interface.js';
 import { DefaultUserService } from '../../shared/modules/user/default-user.service.js';
 import { MongoDatabaseClient } from '../../shared/libs/database-client/mongo.database-client.js';
-import { DEFAULT_DB_PORT, DEFAULT_USER_PASSWORD } from './command.constant.js';
+import { DEFAULT_DB_PORT } from './command.constant.js';
 import { OfferService } from '../../shared/modules/offer/offer-service.interface.js';
 import { ConsoleLogger } from '../../shared/libs/logger/console.logger.js';
 import { DefaultOfferService } from '../../shared/modules/offer/default-offer.service.js';
 import { OfferModel } from '../../shared/modules/offer/offer.entity.js';
 import { UserModel } from '../../shared/modules/user/user.entity.js';
 import { CommentModel } from '../../shared/modules/comments/comment.entity.js';
-import { ParsedLine } from '../../shared/types/index.js';
+import { ParsedLine, UserType, UserTypeEnum } from '../../shared/types/index.js';
+
+const isUserType = (type: string): type is UserType =>
+  type === UserTypeEnum.Standart || type === UserTypeEnum.Pro;
 
 export class ImportCommand implements Command {
   private userService: UserService;
@@ -36,13 +39,23 @@ export class ImportCommand implements Command {
   }
 
   private async saveOffer({ offer, user }: ParsedLine) {
-    const existingUser = await this.userService.findOrCreate(
-      {
-        ...user,
-        password: DEFAULT_USER_PASSWORD,
-      },
-      this.salt
-    );
+    if (!isUserType(user.type)) {
+      return;
+    }
+
+    const existingUser = await this.userService.findByEmail(user.email);
+    const dbUser =
+            existingUser ??
+            (await this.userService.create(
+              {
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar,
+                password: user.password,
+                type: user.type,
+              },
+              this.salt
+            ));
 
     await this.offerService.create({
       name: offer.name,
@@ -52,14 +65,13 @@ export class ImportCommand implements Command {
       preview: offer.preview,
       images: offer.images,
       isPremium: offer.isPremium,
-      isFavorite: offer.isFavorite,
       rating: offer.rating,
       type: offer.type,
       rooms: offer.rooms,
       guests: offer.guests,
       price: offer.price,
       features: offer.features,
-      authorId: existingUser.id,
+      authorId: dbUser.id,
       coordinates: offer.coordinates,
     });
   }

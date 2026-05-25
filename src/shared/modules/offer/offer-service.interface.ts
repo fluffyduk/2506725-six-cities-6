@@ -23,5 +23,4 @@ export interface OfferService extends DocumentExists {
     deleteFromFavorite(offerId: string, userId: string): Promise<void>;
     incCommentCount(offerId: string): Promise<void>;
     recalculateRating(offerId: string): Promise<void>;
-    exists(documentId: string): Promise<boolean>;
 }

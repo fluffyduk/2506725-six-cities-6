@@ -38,4 +38,16 @@ Content-Type: image/png
 < /Users/klim/Desktop/oleg_avatar.png
 ------WebKitFormBoundary8Fgp40JzFcc--
 
-##
+###
+
+## Проверить токен пользователя
+GET http://localhost:4000/users/login HTTP/1.1
+Authorization: Bearer eyJhbGJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFifl1lfPEfenuv9wnU213m78FjoiSmVmcmV5IEVwc3RpbmUiLCJpZCI6IjY5ZGE2MTE0ODM5YjkwZTc3NGI4ZDZmMCIsImlhdCI6MTc3OwiZXhwIjoxNzc5Njk4NTEwfQ.mPNwXEulq1b54mdmb7nb3qo7EGyf-U-spbDtMzIh5HDBUs4
+
+###
+
+## Добавить предложение в избранное
+POST http://localhost:4000/offers/69da33e4bbece92e29 HTTP/1.1
+Content-Type: application/json
+
+###

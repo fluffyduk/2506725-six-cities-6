@@ -3,6 +3,7 @@ import {
   BaseController,
   HttpError,
   HttpMethod,
+  PrivateRouteMiddleware,
   UploadFileMiddleware,
   ValidateDtoMiddleware,
   ValidateObjectMiddleware,
@@ -18,16 +19,18 @@ import { UserRdo } from './rdo/user.rdo.js';
 import { LoginUserRequest } from './requests/login-user-request.type.ts';
 import { LogoutUserRequest } from './requests/logout-user-request.type.ts';
 import { RefreshUserRequest } from './requests/refresh-user-request.type.ts';
-import { MeUserRequest } from './requests/me-user-request.type.ts';
 import { CreateUserRequest } from './requests/create-user-request.type.js';
 import { CreateUserDto, LoginUserDto } from './index.ts';
+import { AuthService } from '../auth/auth-service.interface.ts';
+import { LoggedUserRdo } from './rdo/logged-user.rdo.ts';
 
 @injectable()
 export class UserController extends BaseController {
   constructor(
         @inject(Component.Logger) readonly logger: Logger,
         @inject(Component.UserService) private readonly userService: UserService,
-        @inject(Component.Config) private readonly config: Config<RestSchema>
+        @inject(Component.Config) private readonly config: Config<RestSchema>,
+        @inject(Component.AuthService) private readonly authService: AuthService
   ) {
     super(logger);
     this.logger.info('Register routes for UserController…');
@@ -41,6 +44,12 @@ export class UserController extends BaseController {
 
     this.addRoute({
       path: '/login',
+      method: HttpMethod.Get,
+      handler: this.checkAuthenticate,
+    });
+
+    this.addRoute({
+      path: '/login',
       method: HttpMethod.Post,
       handler: this.login,
       middlewares: [new ValidateDtoMiddleware(LoginUserDto)],
@@ -50,18 +59,14 @@ export class UserController extends BaseController {
       path: '/logout',
       method: HttpMethod.Post,
       handler: this.logout,
+      middlewares: [new PrivateRouteMiddleware()],
     });
 
     this.addRoute({
       path: '/refresh',
       method: HttpMethod.Post,
       handler: this.refresh,
-    });
-
-    this.addRoute({
-      path: '/me',
-      method: HttpMethod.Get,
-      handler: this.me,
+      middlewares: [new PrivateRouteMiddleware()],
     });
 
     this.addRoute({
@@ -69,6 +74,7 @@ export class UserController extends BaseController {
       method: HttpMethod.Post,
       handler: this.uploadAvatar,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectMiddleware('userId'),
         new UploadFileMiddleware(this.config.get('UPLOAD_DIRECTORY'), 'avatar'),
       ],
@@ -84,7 +90,7 @@ export class UserController extends BaseController {
     if (existUser) {
       throw new HttpError(
         StatusCodes.CONFLICT,
-        `User with email «${body.email}» exists.`,
+        `Пользователь с почтой «${body.email}» уже существует.`,
         'UserController'
       );
     }
@@ -94,16 +100,14 @@ export class UserController extends BaseController {
   }
 
   public async login({ body }: LoginUserRequest, res: Response): Promise<void> {
-    const existUser = await this.userService.findByEmail(body.email);
-    if (!existUser) {
-      throw new HttpError(
-        StatusCodes.UNAUTHORIZED,
-        `User with email ${body.email} not found.`,
-        'UserController'
-      );
-    }
+    const user = await this.authService.verify(body);
+    const token = await this.authService.authenticate(user);
 
-    this.ok(res, { token: String(existUser._id) });
+    const responseData = fillDTO(LoggedUserRdo, {
+      email: user.email,
+      token,
+    });
+    this.ok(res, responseData);
   }
 
   public async logout(
@@ -120,11 +124,24 @@ export class UserController extends BaseController {
     this.ok(res, body.token);
   }
 
-  public async me({ body }: MeUserRequest, res: Response): Promise<void> {
-    this.ok(res, { body });
-  }
-
   public async uploadAvatar(req: Request, res: Response): Promise<void> {
     this.created(res, { filepath: req.file?.path });
+  }
+
+  public async checkAuthenticate(
+    { tokenPayload: { email } }: Request,
+    res: Response
+  ) {
+    const foundedUser = await this.userService.findByEmail(email);
+
+    if (!foundedUser) {
+      throw new HttpError(
+        StatusCodes.UNAUTHORIZED,
+        'Неавторизован',
+        'UserController'
+      );
+    }
+
+    this.ok(res, fillDTO(LoggedUserRdo, foundedUser));
   }
 }

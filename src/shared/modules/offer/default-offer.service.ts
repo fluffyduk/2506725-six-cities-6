@@ -129,7 +129,7 @@ export class DefaultOfferService implements OfferService {
     await this.offerModel.findByIdAndUpdate(offerId, { rating: avgRating });
   }
 
-  public async exists(documentId: string): Promise<boolean> {
+  public async documentExists(documentId: string): Promise<boolean> {
     return (await this.offerModel.exists({ _id: documentId })) !== null;
   }
 

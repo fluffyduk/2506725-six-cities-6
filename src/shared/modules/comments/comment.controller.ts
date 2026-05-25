@@ -1,5 +1,5 @@
 import { inject, injectable } from 'inversify';
-import { BaseController, DocumentExistsMiddleware, HttpMethod, RequestBody, RequestParams, ValidateDtoMiddleware, ValidateObjectMiddleware } from '../../libs/rest/index.ts';
+import { BaseController, DocumentExistsMiddleware, HttpError, HttpMethod, PrivateRouteMiddleware, RequestBody, RequestParams, ValidateDtoMiddleware, ValidateObjectMiddleware } from '../../libs/rest/index.ts';
 import { Component } from '../../types/component.enum.ts';
 import { Logger } from '../../libs/logger/logger.interface.ts';
 import { CommentService } from './comment-service.interface.ts';
@@ -8,6 +8,7 @@ import { Request, Response } from 'express';
 import { fillDTO, getId } from '../../helpers/index.ts';
 import { CommentRdo } from './rdo/comment.rdo.ts';
 import { OfferService } from '../offer/offer-service.interface.ts';
+import { StatusCodes } from 'http-status-codes';
 
 @injectable()
 export class CommentController extends BaseController {
@@ -30,6 +31,7 @@ export class CommentController extends BaseController {
       method: HttpMethod.Post,
       handler: this.create,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectMiddleware('offerId'),
         new ValidateDtoMiddleware(CreateCommentDto),
         new DocumentExistsMiddleware(offerService, 'Offer', 'offerId')
@@ -47,9 +49,20 @@ export class CommentController extends BaseController {
     req: Request<RequestParams, RequestBody, CreateCommentDto>,
     res: Response
   ) {
-    const offerId = getId(req.params);
-    const dto = { ...req.body, offerId};
-    const result = await this.commentService.create(fillDTO(CommentRdo, dto));
-    this.ok(res, result);
+    if (!(await this.offerService.documentExists(req.body.offerId))) {
+      throw new HttpError(
+        StatusCodes.NOT_FOUND,
+        `Предложения с id ${req.body.offerId} не существует`,
+        'CommentController'
+      );
+    }
+
+    const comment = await this.commentService.create({
+      ...req.body,
+      authorId: req.tokenPayload.id,
+    });
+
+    await this.offerService.incCommentCount(req.body.offerId);
+    this.created(res, fillDTO(CommentRdo, comment));
   }
 }

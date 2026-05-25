@@ -24,9 +24,6 @@ export const OfferValidationMessage = {
   isPremium: {
     invalidFormat: 'Поле isPremium должно иметь булевый тип',
   },
-  isFavorite: {
-    invalidFormat: 'Поле isFavorite должно иметь булевый тип',
-  },
   rating: {
     invalidFormat: 'Рейтинг должен быть числом',
     min: 'Минимальное значение рейтинга -- 1',

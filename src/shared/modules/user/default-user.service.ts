@@ -1,10 +1,11 @@
-import { DocumentType, types } from '@typegoose/typegoose';
+import { DocumentType, Ref, types } from '@typegoose/typegoose';
 import { CreateUserDto } from './dto/create-user.dto.ts';
 import { UserService } from './user-service.interface.ts';
 import { UserEntity } from './user.entity.ts';
 import { inject, injectable } from 'inversify';
 import { Component, User } from '../../types/index.ts';
 import { Logger } from '../../libs/logger/index.ts';
+import { OfferEntity } from '../offer/index.ts';
 
 @injectable()
 export class DefaultUserService implements UserService {
@@ -24,7 +25,7 @@ export class DefaultUserService implements UserService {
   }
 
   public findById(id: string): Promise<DocumentType<UserEntity> | null> {
-    return this.userModel.findOne({ id });
+    return this.userModel.findOne({ _id: id });
   }
 
   public async findByEmail(email: string): Promise<DocumentType<UserEntity> | null> {
@@ -39,5 +40,34 @@ export class DefaultUserService implements UserService {
     }
 
     return this.create(dto, salt);
+  }
+
+  public async addFavorite(userId: string, offerId: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, {
+      $addToSet: { favorites: offerId },
+    });
+  }
+
+  public async getFavorites(userId: string): Promise<Ref<OfferEntity>[]> {
+    const existedUser = await this.findById(userId);
+    if (existedUser) {
+      await existedUser.populate('favorites');
+    }
+    return existedUser?.favorites || [];
+  }
+
+  public async getFavoriteIds(userId: string): Promise<string[]> {
+    const user = await this.findById(userId);
+    if (!user || !user.favorites) {
+      return [];
+    }
+    this.logger.info(user.favorites.toString());
+    return [...user.favorites].map((favorite) => favorite.toString());
+  }
+
+  public async deleteFavorite(userId: string, offerId: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, {
+      $pull: { favorites: offerId },
+    });
   }
 }

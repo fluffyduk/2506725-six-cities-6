@@ -63,3 +63,56 @@ DELETE http://localhost:4000/offers/69da33e4bbece92e29/favorite HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer eyJhbGJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFifl1lfPEfenuv9wnU213m78FjoiSmVmcmV5IEVwc3RpbmUiLCJpZCI6IjY5ZGE2MTE0ODM5YjkwZTc3NGI4ZDZmMCIsImlhdCI6MTc3OwiZXhwIjoxNzc5Njk4NTEwfQ.mPNwXEulq1b54mdmb7nb3qo7EGyf-U-spbDtMzIh5HDBUs4
 ###
+
+### Загрузить превью для предложения
+POST http://localhost:4000/offers/69da33e4bbece92e29/preview HTTP/1.1
+Authorization: Bearer eyJhbGJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFifl1lfPEfenuv9wnU213m78FjoiSmVmcmV5IEVwc3RpbmUiLCJpZCI6IjY5ZGE2MTE0ODM5YjkwZTc3NGI4ZDZmMCIsImlhdCI6MTc3OwiZXhwIjoxNzc5Njk4NTEwfQ.mPNwXEulq1b54mdmb7nb3qo7EGyf-U-spbDtMzIh5HDBUs4
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryPreview
+
+------WebKitFormBoundaryPreview
+Content-Disposition: form-data; name="preview"; filename="preview.jpg"
+Content-Type: image/jpeg
+
+< ../../../../static/preview.jpg
+------WebKitFormBoundaryPreview--
+
+###
+
+### Заменить все 6 изображений в предложении
+POST http://localhost:4000/offers/69da33e4bbece92e29/images HTTP/1.1
+Authorization: Bearer eyJhbGJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFifl1lfPEfenuv9wnU213m78FjoiSmVmcmV5IEVwc3RpbmUiLCJpZCI6IjY5ZGE2MTE0ODM5YjkwZTc3NGI4ZDZmMCIsImlhdCI6MTc3OwiZXhwIjoxNzc5Njk4NTEwfQ.mPNwXEulq1b54mdmb7nb3qo7EGyf-U-spbDtMzIh5HDBUs4
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundaryReplace
+
+------WebKitFormBoundaryReplace
+Content-Disposition: form-data; name="images"; filename="default_photo.jpg"
+Content-Type: image/jpeg
+
+< ../../../../static/default-photo.jpg
+------WebKitFormBoundaryReplace
+Content-Disposition: form-data; name="images"; filename="new-room-1.jpg"
+Content-Type: image/jpeg
+
+< ../../../../static/default-photo.jpg
+------WebKitFormBoundaryReplace
+Content-Disposition: form-data; name="images"; filename="new-room-2.jpg"
+Content-Type: image/jpeg
+
+< ../../../../static/default-photo.jpg
+------WebKitFormBoundaryReplace
+Content-Disposition: form-data; name="images"; filename="new-room-3.jpg"
+Content-Type: image/jpeg
+
+< ../../../../static/default-photo.jpg
+------WebKitFormBoundaryReplace
+Content-Disposition: form-data; name="images"; filename="new-room-4.jpg"
+Content-Type: image/jpeg
+
+< ../../../../static/default-photo.jpg
+------WebKitFormBoundaryReplace
+Content-Disposition: form-data; name="images"; filename="new-room-5.jpg"
+Content-Type: image/jpeg
+
+< ../../../../static/default-photo.jpg
+------WebKitFormBoundaryReplace--
+
+###

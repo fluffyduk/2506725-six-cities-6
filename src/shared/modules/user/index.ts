@@ -3,3 +3,4 @@ export * from './dto/create-user.dto.ts';
 export * from './default-user.service.ts';
 export * from './user.container.ts';
 export * from './dto/login-user.dto.ts';
+export * from './user.constant.ts';

@@ -2,10 +2,12 @@ import { inject, injectable } from 'inversify';
 import { RestSchema, Config } from '../shared/libs/config/index.ts';
 import { Logger } from '../shared/libs/logger/index.ts';
 import { Component } from '../shared/types/component.enum.ts';
-import { getMongoURI } from '../shared/helpers/index.ts';
+import { getFullServerPath, getMongoURI } from '../shared/helpers/index.ts';
 import { DatabaseClient } from '../shared/libs/database-client/database-client.interface.ts';
 import express, { Express } from 'express';
 import { Controller, ExceptionFilter, ParseTokenMiddleware } from '../shared/libs/rest/index.ts';
+import { STATIC_FILES_ROUTE, STATIC_UPLOAD_ROUTE } from './rest.constant.ts';
+import cors from 'cors';
 
 @injectable()
 export class RestApplication {
@@ -19,7 +21,9 @@ export class RestApplication {
         @inject(Component.UserController) private readonly userController: Controller,
         @inject(Component.ExceptionFilter) private readonly appExceptionFilter: ExceptionFilter,
         @inject(Component.CommentController) private readonly commentController: Controller,
-        @inject(Component.AuthExceptionFilter) private readonly authExceptionFilter: ExceptionFilter
+        @inject(Component.AuthExceptionFilter) private readonly authExceptionFilter: ExceptionFilter,
+        @inject(Component.HttpExceptionFilter) private readonly httpExceptionFilter: ExceptionFilter,
+        @inject(Component.ValidationExceptionFilter) private readonly validationExceptionFilter: ExceptionFilter
 
   ) {
     this.server = express();
@@ -51,13 +55,17 @@ export class RestApplication {
   private async _initMiddleware() {
     const authMiddleware = new ParseTokenMiddleware(this.config.get('JWT_SECRET'));
     this.server.use(express.json());
-    this.server.use('/upload', express.static(this.config.get('UPLOAD_DIRECTORY')));
+    this.server.use(STATIC_UPLOAD_ROUTE, express.static(this.config.get('UPLOAD_DIRECTORY')));
+    this.server.use(STATIC_FILES_ROUTE, express.static(this.config.get('STATIC_DIRECTORY_PATH')));
     this.server.use(authMiddleware.execute.bind(authMiddleware));
+    this.server.use(cors());
   }
 
   private async _initExceptionFilter() {
     this.server.use(this.authExceptionFilter.catch.bind(this.authExceptionFilter));
     this.server.use(this.appExceptionFilter.catch.bind(this.appExceptionFilter));
+    this.server.use(this.validationExceptionFilter.catch.bind(this.validationExceptionFilter));
+    this.server.use(this.httpExceptionFilter.catch.bind(this.httpExceptionFilter));
   }
 
   public async init() {
@@ -70,7 +78,7 @@ export class RestApplication {
 
     this.logger.info('Инициализация сервера...');
     await this._initServer();
-    this.logger.info(`Сервер запущен на http://localhost:${this.config.get('PORT')}`);
+    this.logger.info(`Сервер запущен на ${getFullServerPath(this.config.get('HOST'), this.config.get('PORT'))}`);
 
     this.logger.info('Инициализация промежуточного ПО...');
     await this._initMiddleware();

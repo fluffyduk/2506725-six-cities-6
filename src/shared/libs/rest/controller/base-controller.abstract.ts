@@ -13,6 +13,10 @@ import { StatusCodes } from 'http-status-codes';
 
 const DEFAULT_CONTENT_TYPE = 'application/json';
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 @injectable()
 export abstract class BaseController implements Controller {
   private readonly _router: Router;
@@ -41,6 +45,10 @@ export abstract class BaseController implements Controller {
   }
 
   public send<T>(res: Response, statusCode: number, data: T): void {
+    if (!isRecord(data)) {
+      throw new Error('Некорректные данные формы');
+    }
+
     res.type(DEFAULT_CONTENT_TYPE).status(statusCode).json(data);
   }
 

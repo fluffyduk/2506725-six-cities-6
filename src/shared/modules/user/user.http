@@ -29,13 +29,14 @@ Content-Type: application/json
 ## Загрузить автар пользователя
 
 POST http://localhost:4000/users/oleg123abcde/avatar HTTP/1.1
+Authorization: Bearer eyJhbGJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFifl1lfPEfenuv9wnU213m78FjoiSmVmcmV5IEVwc3RpbmUiLCJpZCI6IjY5ZGE2MTE0ODM5YjkwZTc3NGI4ZDZmMCIsImlhdCI6MTc3OwiZXhwIjoxNzc5Njk4NTEwfQ.mPNwXEulq1b54mdmb7nb3qo7EGyf-U-spbDtMzIh5HDBUs4
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary8Fgp40JzFcc
 
 ------WebKitFormBoundary8Fgp40JzFcc
-Content-Disposition: form-data; name="avatar"; filename="oleg_avatar.png"
+Content-Disposition: form-data; name="avatar"; filename="default_avatar.jpg"
 Content-Type: image/png
 
-< /Users/klim/Desktop/oleg_avatar.png
+< ../../../../static/default-avatar.jpg
 ------WebKitFormBoundary8Fgp40JzFcc--
 
 ###

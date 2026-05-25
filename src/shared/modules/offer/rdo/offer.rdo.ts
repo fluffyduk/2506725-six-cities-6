@@ -12,7 +12,10 @@ export class OfferRdo {
     public city: OfferCityType;
 
     @Expose()
-    public image: string;
+    public preview: string;
+
+    @Expose()
+    public images: string[];
 
     @Expose()
     public price: number;

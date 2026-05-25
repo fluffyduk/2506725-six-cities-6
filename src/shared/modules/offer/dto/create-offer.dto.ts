@@ -39,13 +39,6 @@ export class CreateOfferDto {
     @IsEnum(OfferCityEnum, { message: OfferValidationMessage.city.invalidType })
     public city: OfferCityType;
 
-    @IsString({ message: OfferValidationMessage.preview.invalidFormat })
-    public preview: string;
-
-    @IsArray({ message: OfferValidationMessage.images.invalidFormat })
-    @IsString({ each: true })
-    public images: string[];
-
     @IsBoolean({ message: OfferValidationMessage.isPremium.invalidFormat })
     public isPremium: boolean;
 

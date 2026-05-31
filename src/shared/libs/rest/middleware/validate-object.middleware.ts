@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { Middleware } from './middleware.interface';
+import { Middleware } from './middleware.interface.ts';
 import { Types } from 'mongoose';
-import { HttpError } from '../errors';
+import { HttpError } from '../errors/index.ts';
 import { StatusCodes } from 'http-status-codes';
 
 export class ValidateObjectMiddleware implements Middleware {

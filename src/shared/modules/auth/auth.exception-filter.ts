@@ -15,6 +15,10 @@ export class AuthExceptionFilter implements ExceptionFilter {
       return next(error);
     }
 
+    if (res.headersSent) {
+      return next(error);
+    }
+
     this.logger.error(`[AuthModule] ${error.message}`, error);
     res
       .status(error.httpStatusCode)

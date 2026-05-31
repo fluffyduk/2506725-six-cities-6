@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { Middleware } from './middleware.interface';
+import { Middleware } from './middleware.interface.ts';
 import multer, { diskStorage } from 'multer';
 import { extension } from 'mime-types';
 import { randomUUID } from 'node:crypto';

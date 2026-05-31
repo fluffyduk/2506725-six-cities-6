@@ -150,6 +150,15 @@ export class OfferController extends BaseController {
     });
   }
 
+  private getOfferRdoData(offer: { toObject: () => Record<string, unknown> }) {
+    const offerObject = offer.toObject();
+
+    return {
+      ...offerObject,
+      id: String(offerObject._id),
+    };
+  }
+
   public async index(req: Request, res: Response): Promise<void> {
     const offers = await this.offerService.find();
     let favoriteIds: string[] = [];
@@ -158,10 +167,12 @@ export class OfferController extends BaseController {
     }
 
     const offerWithFavotiresFlag = offers.map((offer) => {
-      const offerObject = offer.toObject();
+      const offerObject = this.getOfferRdoData(offer);
+      const { id } = offerObject;
+
       return {
         ...offerObject,
-        isFavorite: favoriteIds.includes(offerObject._id.toString()),
+        isFavorite: typeof id === 'string' && favoriteIds.includes(id),
       };
     });
     const responseData = fillDTO(OfferRdo, offerWithFavotiresFlag);
@@ -185,7 +196,7 @@ export class OfferController extends BaseController {
       ...req.body,
       authorId: req.tokenPayload.id,
     });
-    this.created(res, fillDTO(OfferRdo, result));
+    this.created(res, fillDTO(OfferRdo, this.getOfferRdoData(result)));
   }
 
   public async get(req: Request, res: Response): Promise<void> {
@@ -193,14 +204,14 @@ export class OfferController extends BaseController {
     this.logger.info('req.url:', req.url);
     const id = getId(req.params);
     const offer = await this.offerService.findByOfferId(id);
-    const responseData = fillDTO(OfferRdo, offer);
+    const responseData = fillDTO(OfferRdo, offer ? this.getOfferRdoData(offer) : offer);
     this.ok(res, responseData);
   }
 
   public async patch(req: PatchOfferRequest, res: Response): Promise<void> {
     const id = getId(req.params);
     const result = await this.offerService.updateById(id, req.body);
-    const responseData = fillDTO(OfferRdo, result);
+    const responseData = fillDTO(OfferRdo, result ? this.getOfferRdoData(result) : result);
     this.ok(res, responseData);
   }
 
@@ -212,7 +223,7 @@ export class OfferController extends BaseController {
 
   public async getPremium(_req: Request, res: Response): Promise<void> {
     const offers = await this.offerService.findPremium();
-    const responseData = fillDTO(OfferRdo, offers);
+    const responseData = fillDTO(OfferRdo, offers.map((offer) => this.getOfferRdoData(offer)));
     this.ok(res, responseData);
   }
 
@@ -248,7 +259,7 @@ export class OfferController extends BaseController {
       updateDto
     );
 
-    this.created(res, fillDTO(OfferRdo, result));
+    this.created(res, fillDTO(OfferRdo, result ? this.getOfferRdoData(result) : result));
   }
 
   public async uploadImages({ params, files }: Request, res: Response) {
@@ -295,6 +306,6 @@ export class OfferController extends BaseController {
       updateDto
     );
 
-    this.created(res, fillDTO(OfferRdo, result));
+    this.created(res, fillDTO(OfferRdo, result ? this.getOfferRdoData(result) : result));
   }
 }

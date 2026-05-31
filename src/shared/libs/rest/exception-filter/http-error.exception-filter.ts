@@ -4,7 +4,6 @@ import { Component } from '../../../types/index.ts';
 import { Logger } from '../../logger/logger.interface.ts';
 import { NextFunction, Request, Response } from 'express';
 import { HttpError } from '../errors/index.ts';
-import { StatusCodes } from 'http-status-codes';
 import { createErrorObject } from '../../../helpers/index.ts';
 import { ApplicationError } from '../types/application-error.enum.ts';
 
@@ -24,13 +23,17 @@ export class HttpErrorExceptionFilter implements ExceptionFilter {
       return next(error);
     }
 
+    if (res.headersSent) {
+      return next(error);
+    }
+
     this.logger.error(
       `[HttpErrorException]: ${req.path} # ${error.message}`,
       error
     );
 
     res
-      .status(StatusCodes.BAD_REQUEST)
+      .status(error.httpStatusCode)
       .json(createErrorObject(ApplicationError.CommonError, error.message));
   }
 }

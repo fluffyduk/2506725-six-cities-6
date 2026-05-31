@@ -42,11 +42,6 @@ export class CreateOfferDto {
     @IsBoolean({ message: OfferValidationMessage.isPremium.invalidFormat })
     public isPremium: boolean;
 
-    @IsInt({ message: OfferValidationMessage.rating.invalidFormat })
-    @Min(1, { message: OfferValidationMessage.rating.min })
-    @Max(5, { message: OfferValidationMessage.rating.max })
-    public rating: number;
-
     @IsEnum(OfferTypeEmum, { message: OfferValidationMessage.type.invalidType })
     public type: OfferType;
 

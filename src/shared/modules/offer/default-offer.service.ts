@@ -24,7 +24,10 @@ export class DefaultOfferService implements OfferService {
   ) { }
 
   public async create(dto: CreateOfferDto): Promise<DocumentType<OfferEntity>> {
-    const result = await this.offerModel.create(dto);
+    const result = await this.offerModel.create({
+      ...dto,
+      rating: 0,
+    });
     this.logger.info(`New offer created: ${dto.name}`);
     return result;
   }
@@ -63,7 +66,10 @@ export class DefaultOfferService implements OfferService {
   }
 
   public async updateById(offerId: string, dto: UpdateOfferDto): Promise<DocumentType<OfferEntity> | null> {
-    return this.offerModel.findOneAndUpdate({ _id: offerId }, dto, {
+    const safeDto = { ...dto };
+    delete (safeDto as Record<string, unknown>).rating;
+
+    return this.offerModel.findOneAndUpdate({ _id: offerId }, safeDto, {
       new: true,
     });
   }
@@ -124,8 +130,9 @@ export class DefaultOfferService implements OfferService {
         },
       ])
       .exec();
-    const avgRating =
-            avgRatingResult.length > 0 ? avgRatingResult[0].avgRating : 0;
+    const avgRating = avgRatingResult.length > 0
+      ? Math.round(avgRatingResult[0].avgRating * 10) / 10
+      : 0;
     await this.offerModel.findByIdAndUpdate(offerId, { rating: avgRating });
   }
 

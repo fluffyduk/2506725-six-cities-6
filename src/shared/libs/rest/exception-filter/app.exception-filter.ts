@@ -17,8 +17,12 @@ export class AppExpectionFilter implements ExceptionFilter {
     error: Error,
     _req: Request,
     res: Response,
-    _next: NextFunction
+    next: NextFunction
   ): void {
+    if (res.headersSent) {
+      return next(error);
+    }
+
     this.logger.error(error.message, error);
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)

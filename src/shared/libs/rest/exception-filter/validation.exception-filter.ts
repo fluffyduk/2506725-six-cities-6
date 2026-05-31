@@ -24,6 +24,10 @@ export class ValidationExceptionFilter implements ExceptionFilter {
       return next(error);
     }
 
+    if (res.headersSent) {
+      return next(error);
+    }
+
     this.logger.error(`[ValidationException]: ${error.message}`, error);
 
     error.details.forEach((errorField) =>

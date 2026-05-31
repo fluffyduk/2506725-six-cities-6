@@ -63,6 +63,7 @@ export class CommentController extends BaseController {
     });
 
     await this.offerService.incCommentCount(req.body.offerId);
+    await this.offerService.recalculateRating(req.body.offerId);
     this.created(res, fillDTO(CommentRdo, comment));
   }
 }

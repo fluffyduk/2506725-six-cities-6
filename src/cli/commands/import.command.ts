@@ -50,7 +50,6 @@ export class ImportCommand implements Command {
               {
                 name: user.name,
                 email: user.email,
-                avatar: user.avatar,
                 password: user.password,
                 type: user.type,
               },
@@ -62,10 +61,7 @@ export class ImportCommand implements Command {
       description: offer.description,
       date: offer.date.toISOString(),
       city: offer.city,
-      preview: offer.preview,
-      images: offer.images,
       isPremium: offer.isPremium,
-      rating: offer.rating,
       type: offer.type,
       rooms: offer.rooms,
       guests: offer.guests,

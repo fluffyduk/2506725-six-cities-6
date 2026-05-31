@@ -24,31 +24,59 @@ export class PathTransformer {
     return STATIC_RESOURCE_FIELDS.includes(property);
   }
 
-  public execute(data: Record<string, unknown>): Record<string, unknown> {
-    const stack = [data];
+  private getStaticResourcePath(value: string): string {
+    if (value.startsWith('http')) {
+      return value;
+    }
+
+    const staticPath = STATIC_FILES_ROUTE;
+    const uploadPath = STATIC_UPLOAD_ROUTE;
+    const serverHost = this.config.get('HOST');
+    const serverPort = this.config.get('PORT');
+    const rootPath = this.hasDefaultImage(value)
+      ? staticPath
+      : uploadPath;
+
+    return `${getFullServerPath(serverHost, serverPort)}${rootPath}/${value}`;
+  }
+
+  public execute<T>(data: T): T {
+    const stack: unknown[] = [data];
     while (stack.length > 0) {
       const current = stack.pop();
 
-      for (const key in current) {
-        if (Object.hasOwn(current, key)) {
-          const value = current[key];
+      if (Array.isArray(current)) {
+        current.forEach((item) => {
+          if (isObject(item) || Array.isArray(item)) {
+            stack.push(item);
+          }
+        });
+        continue;
+      }
 
-          if (isObject(value)) {
+      if (!isObject(current)) {
+        continue;
+      }
+
+      const currentObject = current as Record<string, unknown>;
+
+      for (const key in currentObject) {
+        if (Object.hasOwn(currentObject, key)) {
+          const value = currentObject[key];
+
+          if (isObject(value) || Array.isArray(value)) {
             stack.push(value);
             continue;
           }
 
           if (this.isStaticProperty(key) && typeof value === 'string') {
-            const staticPath = STATIC_FILES_ROUTE;
-            const uploadPath = STATIC_UPLOAD_ROUTE;
-            const serverHost = this.config.get('HOST');
-            const serverPort = this.config.get('PORT');
+            currentObject[key] = this.getStaticResourcePath(value);
+          }
 
-            const rootPath = this.hasDefaultImage(value)
-              ? staticPath
-              : uploadPath;
-            current[key] =
-              `${getFullServerPath(serverHost, serverPort)}${rootPath}/${value}`;
+          if (this.isStaticProperty(key) && Array.isArray(value)) {
+            currentObject[key] = value.map((item) =>
+              typeof item === 'string' ? this.getStaticResourcePath(item) : item
+            );
           }
         }
       }

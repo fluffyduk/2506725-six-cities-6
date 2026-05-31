@@ -109,10 +109,10 @@ export class UserController extends BaseController {
   }
 
   public async logout(
-    { body }: LogoutUserRequest,
+    _req: LogoutUserRequest,
     res: Response
   ): Promise<void> {
-    this.noContent(res, { body });
+    this.noContent(res);
   }
 
   public async refresh(

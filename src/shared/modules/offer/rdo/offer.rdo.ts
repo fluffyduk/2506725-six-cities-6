@@ -9,6 +9,9 @@ export class OfferRdo {
     public name: string;
 
     @Expose()
+    public description: string;
+
+    @Expose()
     public city: OfferCityType;
 
     @Expose()
